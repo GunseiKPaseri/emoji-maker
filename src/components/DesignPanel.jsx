@@ -153,7 +153,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
         </h2>
         <button
           onClick={onReset}
-          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-2"
+          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-2 cursor-pointer"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -191,7 +191,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
         <Disclosure>
           {({ open }) => (
             <>
-              <DisclosureButton className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+              <DisclosureButton className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer">
                 <svg
                   className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-90' : 'rotate-0'}`}
                   fill="currentColor"
@@ -215,7 +215,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
                           key={textIndex}
                           onClick={() => handleChange('text', text)}
                           title={text}
-                          className="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-sm hover:bg-gray-200 transition-colors duration-200"
+                          className="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-sm hover:bg-gray-200 transition-colors duration-200 cursor-pointer"
                         >
                           {text.replace(/\n/g, ' ')}
                         </button>
@@ -235,7 +235,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
           {({ open }) => (
             <>
               <div className="relative">
-                <ListboxButton className="relative w-full cursor-default rounded-lg bg-white py-2.5 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                <ListboxButton className="relative w-full cursor-pointer rounded-lg bg-white py-2.5 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                   <span className="block truncate" style={{ fontFamily: selectedFont.family }}>
                     {selectedFont.name}
                     {config.text && (
@@ -326,7 +326,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             type="checkbox"
             checked={config.autoFontSize}
             onChange={e => handleChange('autoFontSize', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/20 border-gray-300 rounded transition-all"
+            className="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/20 border-gray-300 rounded transition-all cursor-pointer"
           />
           <span className="ml-3 text-sm font-medium text-gray-700">フォントサイズを自動調整</span>
         </label>
@@ -356,7 +356,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             type="checkbox"
             checked={config.autoFitWidth}
             onChange={e => handleChange('autoFitWidth', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/20 border-gray-300 rounded transition-all"
+            className="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/20 border-gray-300 rounded transition-all cursor-pointer"
           />
           <span className="ml-3 text-sm font-medium text-gray-700">
             幅自動調整（各行を出力サイズに合わせて拡大・縮小）
@@ -424,7 +424,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
         <Popover className="relative">
           {({ open }) => (
             <>
-              <PopoverButton className="flex items-center gap-2 w-full justify-start px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200">
+              <PopoverButton className="flex items-center gap-2 w-full justify-start px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 cursor-pointer">
                 <div
                   className="w-6 h-6 rounded border border-gray-300"
                   style={{ backgroundColor: config.color }}
@@ -478,7 +478,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
                           onClick={() => handleChange('color', preset.color)}
                           title={preset.name}
                           aria-label={`色を${preset.name}に変更`}
-                          className="w-7 h-7 rounded border border-gray-300 hover:scale-110 transition-transform duration-200"
+                          className="w-7 h-7 rounded border border-gray-300 hover:scale-110 transition-transform duration-200 cursor-pointer"
                         />
                       ))}
                     </div>
@@ -496,7 +496,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             type="checkbox"
             checked={config.transparentBackground}
             onChange={e => handleChange('transparentBackground', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/20 border-gray-300 rounded transition-all"
+            className="h-4 w-4 text-blue-600 focus:ring-2 focus:ring-blue-500/20 border-gray-300 rounded transition-all cursor-pointer"
           />
           <span className="ml-3 text-sm font-medium text-gray-700">背景を透明にする</span>
         </label>
@@ -506,7 +506,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             <Popover className="relative">
               {({ open }) => (
                 <>
-                  <PopoverButton className="flex items-center gap-2 w-full justify-start px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200">
+                  <PopoverButton className="flex items-center gap-2 w-full justify-start px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 cursor-pointer">
                     <div
                       className="w-6 h-6 rounded border border-gray-300"
                       style={{ backgroundColor: config.backgroundColor }}
@@ -560,7 +560,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
                               onClick={() => handleChange('backgroundColor', preset.color)}
                               title={preset.name}
                               aria-label={`背景色を${preset.name}に変更`}
-                              className="w-7 h-7 rounded border border-gray-300 hover:scale-110 transition-transform duration-200"
+                              className="w-7 h-7 rounded border border-gray-300 hover:scale-110 transition-transform duration-200 cursor-pointer"
                             />
                           ))}
                         </div>
@@ -582,7 +582,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
           {({ open }) => (
             <>
               <div className="relative">
-                <ListboxButton className="relative w-full cursor-default rounded-lg bg-white py-2.5 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+                <ListboxButton className="relative w-full cursor-pointer rounded-lg bg-white py-2.5 pl-3 pr-10 text-left border border-gray-300 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
                   <span className="block truncate">
                     {config.size}×{config.size}px (
                     {config.size <= 64

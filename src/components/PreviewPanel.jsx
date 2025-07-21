@@ -281,7 +281,7 @@ function PreviewPanel({ config }) {
         </h2>
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-blue-500 to-purple-600 rounded-xl hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
+          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-blue-500 to-purple-600 rounded-xl hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg cursor-pointer"
         >
           {showSettings ? '設定を隠す' : '設定を表示'}
         </button>
@@ -529,7 +529,7 @@ function PreviewPanel({ config }) {
         <button
           onClick={downloadEmoji}
           disabled={!config.text.trim()}
-          className="w-full px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold text-lg rounded-2xl hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="w-full px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold text-lg rounded-2xl hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
         >
           <div className="flex items-center justify-center gap-3">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
