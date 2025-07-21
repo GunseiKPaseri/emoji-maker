@@ -436,13 +436,7 @@ function PreviewPanel({ config }) {
                     <span className="text-xs text-gray-500">午後2:31</span>
                   </div>
                   <div>
-                    {emojiDataUrl && (
-                      <img
-                        src={emojiDataUrl}
-                        alt="emoji"
-                        className="w-10 h-10 rounded-lg shadow-xs"
-                      />
-                    )}
+                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-10 h-10" />}
                   </div>
                 </div>
               </div>
@@ -502,13 +496,7 @@ function PreviewPanel({ config }) {
                     <span className="text-xs text-gray-400">午後2:31</span>
                   </div>
                   <div>
-                    {emojiDataUrl && (
-                      <img
-                        src={emojiDataUrl}
-                        alt="emoji"
-                        className="w-10 h-10 rounded-lg shadow-xs"
-                      />
-                    )}
+                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-10 h-10" />}
                   </div>
                 </div>
               </div>
