@@ -146,16 +146,16 @@ function DesignPanel({ config, onConfigChange, onReset }) {
   const selectedFont = allFonts.find(font => font.family === config.fontFamily) || allFonts[0]
 
   return (
-    <div className="bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 p-8 backdrop-blur-xs">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+    <div className="bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6 lg:p-8 backdrop-blur-xs">
+      <div className="flex justify-between items-center mb-4 sm:mb-6 lg:mb-8">
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           デザイン設定
         </h2>
         <button
           onClick={onReset}
-          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-2 cursor-pointer"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-linear-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-1 sm:gap-2 cursor-pointer"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -179,7 +179,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             placeholder="絵文字にするテキストを入力&#10;改行で複数行も可能"
             rows={3}
             maxLength="50"
-            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none transition-all duration-200"
+            className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none transition-all duration-200"
           />
           <div className="absolute bottom-2 right-3 text-xs text-gray-400">
             {config.text.length}/50

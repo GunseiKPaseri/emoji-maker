@@ -269,24 +269,24 @@ function PreviewPanel({ config }) {
   }
 
   return (
-    <div className="bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 p-8 backdrop-blur-xs">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+    <div className="bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 p-4 sm:p-6 lg:p-8 backdrop-blur-xs">
+      <div className="flex justify-between items-center mb-4 sm:mb-6 lg:mb-8">
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           プレビュー
         </h2>
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-blue-500 to-purple-600 rounded-xl hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg cursor-pointer"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-white bg-linear-to-r from-blue-500 to-purple-600 rounded-xl hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg cursor-pointer"
         >
           {showSettings ? '設定を隠す' : '設定を表示'}
         </button>
       </div>
 
       <div className="space-y-8">
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div className="text-center">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-center gap-2">
-              <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+            <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center justify-center gap-2">
+              <svg className="w-3 sm:w-4 h-3 sm:h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fillRule="evenodd"
                   d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 18a8 8 0 100-16 8 8 0 000 16z"
@@ -295,13 +295,13 @@ function PreviewPanel({ config }) {
               </svg>
               ライトモード
             </h4>
-            <div className="inline-block p-6 bg-white border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="inline-block p-3 sm:p-4 lg:p-6 bg-white border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
               <canvas
                 ref={lightCanvasRef}
                 className="block rounded-lg"
                 style={{
-                  width: '128px',
-                  height: '128px',
+                  width: '96px',
+                  height: '96px',
                   imageRendering: 'pixelated',
                 }}
               />
@@ -309,19 +309,19 @@ function PreviewPanel({ config }) {
           </div>
 
           <div className="text-center">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-center gap-2">
-              <svg className="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+            <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center justify-center gap-2">
+              <svg className="w-3 sm:w-4 h-3 sm:h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
               </svg>
               ダークモード
             </h4>
-            <div className="inline-block p-6 border-2 border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ backgroundColor: '#1d1c1d' }}>
+            <div className="inline-block p-3 sm:p-4 lg:p-6 border-2 border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ backgroundColor: '#1d1c1d' }}>
               <canvas
                 ref={darkCanvasRef}
                 className="block rounded-lg"
                 style={{
-                  width: '128px',
-                  height: '128px',
+                  width: '96px',
+                  height: '96px',
                   imageRendering: 'pixelated',
                 }}
               />
@@ -518,10 +518,10 @@ function PreviewPanel({ config }) {
         <button
           onClick={downloadEmoji}
           disabled={!config.text.trim()}
-          className="w-full px-8 py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold text-lg rounded-2xl hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
+          className="w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold text-base sm:text-lg rounded-2xl hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
         >
-          <div className="flex items-center justify-center gap-3">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

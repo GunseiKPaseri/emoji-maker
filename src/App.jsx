@@ -32,12 +32,12 @@ function App() {
       <header className="relative overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
         <div className="relative bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-8">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3 sm:mb-4">
                 Slack Emoji Maker
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-lg text-gray-600 max-w-2xl mx-auto px-2">
                 フォント、文字列、色を指定して美しいSlack用絵文字を簡単に作成
               </p>
             </div>
@@ -45,16 +45,16 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-          <div className="space-y-6">
+      <main className="max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
+          <div className="space-y-4 sm:space-y-6">
             <DesignPanel
               config={emojiConfig}
               onConfigChange={setEmojiConfig}
               onReset={resetConfig}
             />
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <PreviewPanel config={emojiConfig} />
           </div>
         </div>
