@@ -1,5 +1,4 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
-import './PreviewPanel.css'
 
 // 通常モード用フォントサイズ自動計算関数（幅と高さ両方を考慮）
 const calculateOptimalFontSize = (
@@ -41,6 +40,7 @@ const calculateOptimalFontSize = (
 
   return Math.max(fontSize, 8)
 }
+
 // 幅自動調整モード用フォントサイズ計算関数（高さのみを基準とする）
 const calculateOptimalFontSizeForAutoFit = (ctx, text, maxHeight, lineHeight = 1.2) => {
   const lines = text.split('\n').filter(line => line.trim())
@@ -274,59 +274,59 @@ function PreviewPanel({ config }) {
   }
 
   return (
-    <div className="preview-panel">
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '15px',
-        }}
-      >
-        <h2 style={{ margin: 0 }}>プレビュー</h2>
+    <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 p-8 backdrop-blur-sm">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          プレビュー
+        </h2>
         <button
           onClick={() => setShowSettings(!showSettings)}
-          style={{
-            background: '#6c757d',
-            color: 'white',
-            border: 'none',
-            padding: '6px 12px',
-            borderRadius: '6px',
-            fontSize: '0.8rem',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
+          className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
         >
           {showSettings ? '設定を隠す' : '設定を表示'}
         </button>
       </div>
 
-      <div className="preview-container">
-        <div className="preview-grid">
-          <div className="preview-item">
-            <h4>ライトモード</h4>
-            <div className="canvas-container light-preview">
+      <div className="space-y-8">
+        <div className="grid grid-cols-2 gap-6">
+          <div className="text-center">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-center gap-2">
+              <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 18a8 8 0 100-16 8 8 0 000 16z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              ライトモード
+            </h4>
+            <div className="inline-block p-6 bg-white border-2 border-gray-200 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
               <canvas
                 ref={lightCanvasRef}
-                className="preview-canvas"
+                className="block rounded-lg"
                 style={{
-                  width: '120px',
-                  height: '120px',
+                  width: '128px',
+                  height: '128px',
                   imageRendering: 'pixelated',
                 }}
               />
             </div>
           </div>
 
-          <div className="preview-item">
-            <h4>ダークモード</h4>
-            <div className="canvas-container dark-preview">
+          <div className="text-center">
+            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center justify-center gap-2">
+              <svg className="w-4 h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+              </svg>
+              ダークモード
+            </h4>
+            <div className="inline-block p-6 bg-gradient-to-br from-gray-800 to-gray-900 border-2 border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
               <canvas
                 ref={darkCanvasRef}
-                className="preview-canvas"
+                className="block rounded-lg"
                 style={{
-                  width: '120px',
-                  height: '120px',
+                  width: '128px',
+                  height: '128px',
                   imageRendering: 'pixelated',
                 }}
               />
@@ -335,230 +335,201 @@ function PreviewPanel({ config }) {
         </div>
 
         {showSettings && (
-          <div className="preview-info">
-            <div className="info-item">
-              <span className="label">サイズ:</span>
-              <span className="value">
-                {config.size}×{config.size}px
-              </span>
-            </div>
-            <div className="info-item">
-              <span className="label">テキスト:</span>
-              <span className="value">"{config.text.replace(/\n/g, '\\n')}"</span>
-            </div>
-            <div className="info-item">
-              <span className="label">フォント:</span>
-              <span className="value">{config.fontFamily}</span>
-            </div>
-            {config.autoFontSize && (
-              <div className="info-item">
-                <span className="label">計算されたフォントサイズ:</span>
-                <span className="value">{calculatedFontSize}px</span>
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-2xl p-6 backdrop-blur-sm">
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">設定詳細</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">サイズ:</span>
+                <span className="text-gray-900 font-mono bg-white px-2 py-1 rounded">
+                  {config.size}×{config.size}px
+                </span>
               </div>
-            )}
-            <div className="info-item">
-              <span className="label">行間倍率:</span>
-              <span className="value">{config.lineHeight}</span>
-            </div>
-            <div className="info-item">
-              <span className="label">上下位置:</span>
-              <span className="value">
-                {config.verticalOffset > 0 ? '+' : ''}
-                {config.verticalOffset}%
-              </span>
-            </div>
-            <div className="info-item">
-              <span className="label">左右余白:</span>
-              <span className="value">{config.horizontalPadding}%</span>
-            </div>
-            <div className="info-item">
-              <span className="label">背景:</span>
-              <span className="value">
-                {config.transparentBackground ? '透明' : config.backgroundColor}
-              </span>
-            </div>
-            <div className="info-item">
-              <span className="label">幅調整:</span>
-              <span className="value">{config.autoFitWidth ? '各行自動拡大・縮小' : '固定幅'}</span>
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">テキスト:</span>
+                <span className="text-gray-900 font-mono bg-white px-2 py-1 rounded truncate ml-2 max-w-32">
+                  "{config.text.replace(/\n/g, '\\n')}"
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">フォント:</span>
+                <span className="text-gray-900 bg-white px-2 py-1 rounded truncate ml-2 max-w-32">
+                  {config.fontFamily}
+                </span>
+              </div>
+              {config.autoFontSize && (
+                <div className="flex justify-between items-center py-2">
+                  <span className="font-medium text-gray-600">計算サイズ:</span>
+                  <span className="text-gray-900 font-mono bg-white px-2 py-1 rounded">
+                    {calculatedFontSize}px
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">行間倍率:</span>
+                <span className="text-gray-900 font-mono bg-white px-2 py-1 rounded">
+                  {config.lineHeight}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">上下位置:</span>
+                <span className="text-gray-900 font-mono bg-white px-2 py-1 rounded">
+                  {config.verticalOffset > 0 ? '+' : ''}
+                  {config.verticalOffset}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">左右余白:</span>
+                <span className="text-gray-900 font-mono bg-white px-2 py-1 rounded">
+                  {config.horizontalPadding}%
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">背景:</span>
+                <span className="text-gray-900 bg-white px-2 py-1 rounded">
+                  {config.transparentBackground ? '透明' : config.backgroundColor}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 col-span-1 md:col-span-2">
+                <span className="font-medium text-gray-600">幅調整:</span>
+                <span className="text-gray-900 bg-white px-2 py-1 rounded">
+                  {config.autoFitWidth ? '各行自動拡大・縮小' : '固定幅'}
+                </span>
+              </div>
             </div>
           </div>
         )}
 
         {/* Slackスタンプ使用プレビュー */}
-        <div className="slack-preview">
-          <h4>Slackでの使用例</h4>
+        <div className="mt-10">
+          <h4 className="text-xl font-bold text-gray-900 mb-6 text-center">Slackでの使用例</h4>
 
           {/* ライトモード */}
-          <div className="slack-theme-section">
-            <h5 className="theme-title">ライトモード</h5>
+          <div className="mb-8">
+            <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <div className="w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full"></div>
+              ライトモード
+            </h5>
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4 shadow-sm">
+              {/* 名前横スタンプ */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                  U
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="font-semibold text-gray-900">ユーザー名</span>
+                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-4 h-4" />}
+                    <span className="text-xs text-gray-500">午後2:30</span>
+                  </div>
+                  <div className="text-gray-700">プロジェクトが完了しました！</div>
+                </div>
+              </div>
 
-            {/* 名前横スタンプ */}
-            <div className="slack-message slack-light">
-              <div className="slack-avatar">
-                <div className="avatar-circle">U</div>
-              </div>
-              <div className="slack-content">
-                <div className="slack-header">
-                  <span className="slack-username">ユーザー名</span>
-                  {emojiDataUrl && (
-                    <img
-                      src={emojiDataUrl}
-                      alt="emoji"
-                      className="emoji-inline"
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        marginLeft: '4px',
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  )}
-                  <span className="slack-time">午後2:30</span>
+              {/* 単体スタンプ */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                  T
                 </div>
-                <div className="slack-text">プロジェクトが完了しました！</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-semibold text-gray-900">田中</span>
+                    <span className="text-xs text-gray-500">午後2:31</span>
+                  </div>
+                  <div>
+                    {emojiDataUrl && (
+                      <img
+                        src={emojiDataUrl}
+                        alt="emoji"
+                        className="w-10 h-10 rounded-lg shadow-sm"
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* 単体スタンプ */}
-            <div className="slack-message slack-light">
-              <div className="slack-avatar">
-                <div className="avatar-circle">T</div>
-              </div>
-              <div className="slack-content">
-                <div className="slack-header">
-                  <span className="slack-username">田中</span>
-                  <span className="slack-time">午後2:31</span>
+              {/* 文中スタンプ */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                  S
                 </div>
-                <div className="slack-text">
-                  {emojiDataUrl && (
-                    <img
-                      src={emojiDataUrl}
-                      alt="emoji"
-                      className="emoji-large"
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                      }}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* 文中スタンプ */}
-            <div className="slack-message slack-light">
-              <div className="slack-avatar">
-                <div className="avatar-circle">S</div>
-              </div>
-              <div className="slack-content">
-                <div className="slack-header">
-                  <span className="slack-username">佐藤</span>
-                  <span className="slack-time">午後2:32</span>
-                </div>
-                <div className="slack-text">
-                  お疲れ様でした！
-                  {emojiDataUrl && (
-                    <img
-                      src={emojiDataUrl}
-                      alt="emoji"
-                      className="emoji-inline"
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        margin: '0 2px',
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  )}
-                  素晴らしい成果ですね
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="font-semibold text-gray-900">佐藤</span>
+                    <span className="text-xs text-gray-500">午後2:32</span>
+                  </div>
+                  <div className="text-gray-700 flex items-center gap-2">
+                    お疲れ様でした！
+                    {emojiDataUrl && (
+                      <img src={emojiDataUrl} alt="emoji" className="w-6 h-6 inline-block" />
+                    )}
+                    素晴らしい成果ですね
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* ダークモード */}
-          <div className="slack-theme-section">
-            <h5 className="theme-title">ダークモード</h5>
+          <div className="mb-8">
+            <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
+              <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full"></div>
+              ダークモード
+            </h5>
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 space-y-4 shadow-lg">
+              {/* 名前横スタンプ */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                  U
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="font-semibold text-white">ユーザー名</span>
+                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-4 h-4" />}
+                    <span className="text-xs text-gray-400">午後2:30</span>
+                  </div>
+                  <div className="text-gray-300">プロジェクトが完了しました！</div>
+                </div>
+              </div>
 
-            {/* 名前横スタンプ */}
-            <div className="slack-message slack-dark">
-              <div className="slack-avatar">
-                <div className="avatar-circle dark">U</div>
-              </div>
-              <div className="slack-content">
-                <div className="slack-header">
-                  <span className="slack-username">ユーザー名</span>
-                  {emojiDataUrl && (
-                    <img
-                      src={emojiDataUrl}
-                      alt="emoji"
-                      className="emoji-inline"
-                      style={{
-                        width: '16px',
-                        height: '16px',
-                        marginLeft: '4px',
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  )}
-                  <span className="slack-time">午後2:30</span>
+              {/* 単体スタンプ */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                  T
                 </div>
-                <div className="slack-text">プロジェクトが完了しました！</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-semibold text-white">田中</span>
+                    <span className="text-xs text-gray-400">午後2:31</span>
+                  </div>
+                  <div>
+                    {emojiDataUrl && (
+                      <img
+                        src={emojiDataUrl}
+                        alt="emoji"
+                        className="w-10 h-10 rounded-lg shadow-sm"
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* 単体スタンプ */}
-            <div className="slack-message slack-dark">
-              <div className="slack-avatar">
-                <div className="avatar-circle dark">T</div>
-              </div>
-              <div className="slack-content">
-                <div className="slack-header">
-                  <span className="slack-username">田中</span>
-                  <span className="slack-time">午後2:31</span>
+              {/* 文中スタンプ */}
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
+                  S
                 </div>
-                <div className="slack-text">
-                  {emojiDataUrl && (
-                    <img
-                      src={emojiDataUrl}
-                      alt="emoji"
-                      className="emoji-large"
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                      }}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* 文中スタンプ */}
-            <div className="slack-message slack-dark">
-              <div className="slack-avatar">
-                <div className="avatar-circle dark">S</div>
-              </div>
-              <div className="slack-content">
-                <div className="slack-header">
-                  <span className="slack-username">佐藤</span>
-                  <span className="slack-time">午後2:32</span>
-                </div>
-                <div className="slack-text">
-                  お疲れ様でした！
-                  {emojiDataUrl && (
-                    <img
-                      src={emojiDataUrl}
-                      alt="emoji"
-                      className="emoji-inline"
-                      style={{
-                        width: '20px',
-                        height: '20px',
-                        margin: '0 2px',
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  )}
-                  素晴らしい成果ですね
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="font-semibold text-white">佐藤</span>
+                    <span className="text-xs text-gray-400">午後2:32</span>
+                  </div>
+                  <div className="text-gray-300 flex items-center gap-2">
+                    お疲れ様でした！
+                    {emojiDataUrl && (
+                      <img src={emojiDataUrl} alt="emoji" className="w-6 h-6 inline-block" />
+                    )}
+                    素晴らしい成果ですね
+                  </div>
                 </div>
               </div>
             </div>
@@ -566,23 +537,57 @@ function PreviewPanel({ config }) {
         </div>
       </div>
 
-      <div className="actions">
-        <button className="download-btn" onClick={downloadEmoji} disabled={!config.text.trim()}>
-          PNG形式でダウンロード
+      <div className="mt-10 space-y-6">
+        <button
+          onClick={downloadEmoji}
+          disabled={!config.text.trim()}
+          className="w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold text-lg rounded-2xl hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+          <div className="flex items-center justify-center gap-3">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            PNG形式でダウンロード
+          </div>
         </button>
 
-        <div className="usage-hint">
-          <p>💡 Slackで使用する場合:</p>
-          <ol>
-            <li>ダウンロードしたPNGファイルを準備</li>
-            <li>Slackの絵文字設定で新しい絵文字を追加</li>
-            <li>ファイルをアップロードして名前を設定</li>
-          </ol>
+        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="text-2xl">💡</div>
+            <div>
+              <p className="text-blue-800 font-semibold mb-3">Slackで使用する手順:</p>
+              <ol className="text-blue-700 space-y-2">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    1
+                  </span>
+                  <span>ダウンロードしたPNGファイルを準備</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    2
+                  </span>
+                  <span>Slackの絵文字設定で新しい絵文字を追加</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                    3
+                  </span>
+                  <span>ファイルをアップロードして名前を設定</span>
+                </li>
+              </ol>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* 隠しキャンバス（ダウンロード用） */}
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
+      <canvas ref={canvasRef} className="hidden" />
     </div>
   )
 }
