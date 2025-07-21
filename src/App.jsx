@@ -11,6 +11,10 @@ function App() {
     autoFitWidth: true, // 自動幅調整モード
     fontFamily: 'Arial, sans-serif',
     color: '#000000',
+    useGradient: false, // グラデーション使用フラグ
+    gradientColor1: '#FF6B6B', // グラデーション開始色
+    gradientColor2: '#4ECDC4', // グラデーション終了色
+    gradientDirection: 'horizontal', // horizontal, vertical, diagonal
     backgroundColor: '#FFFFFF',
     transparentBackground: true,
     size: 128,

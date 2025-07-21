@@ -70,15 +70,135 @@ function PreviewPanel({ config }) {
   const [showSettings, setShowSettings] = useState(false)
   const [emojiDataUrl, setEmojiDataUrl] = useState('')
 
-  // 各行を通常幅でレンダリングして縮小貼り付けする関数
+  // 正方形グラデーションを作成する関数
+  const createSquareGradient = useCallback(
+    (ctx, canvasSize) => {
+      const gradientDirection = config.gradientDirection || 'horizontal'
+      const gradientColor1 = config.gradientColor1 || '#FF6B6B'
+      const gradientColor2 = config.gradientColor2 || '#4ECDC4'
+      
+      let gradient
+      
+      switch (gradientDirection) {
+        case 'horizontal':
+          gradient = ctx.createLinearGradient(0, 0, canvasSize, 0)
+          break
+        case 'vertical':
+          gradient = ctx.createLinearGradient(0, 0, 0, canvasSize)
+          break
+        case 'diagonal':
+          gradient = ctx.createLinearGradient(0, 0, canvasSize, canvasSize)
+          break
+        default:
+          gradient = ctx.createLinearGradient(0, 0, canvasSize, 0)
+      }
+      
+      gradient.addColorStop(0, gradientColor1)
+      gradient.addColorStop(1, gradientColor2)
+      return gradient
+    },
+    [config.gradientColor1, config.gradientColor2, config.gradientDirection]
+  )
+
+  // 文字の配置情報を計算する関数
+  const calculateTextLayout = useCallback(
+    (ctx, text, fontSize, fontFamily, canvasSize, lineHeight, verticalOffset) => {
+      ctx.font = `${fontSize}px ${fontFamily}`
+      const lines = text.split('\n').filter(line => line.trim())
+      
+      if (lines.length === 0) return null
+      
+      const actualLineHeight = fontSize * lineHeight
+      const totalHeight = lines.length * actualLineHeight
+      const verticalOffsetPx = (canvasSize * verticalOffset) / 100
+      const startY = (canvasSize - totalHeight) / 2 + actualLineHeight / 2 + verticalOffsetPx
+      
+      return {
+        lines,
+        actualLineHeight,
+        totalHeight,
+        startY
+      }
+    },
+    []
+  )
+
+  // マスキング処理でグラデーションを文字に適用する関数
+  const drawTextWithGradientMask = useCallback(
+    (ctx, textLayout, fontSize, fontFamily, canvasSize, gradient, autoFitWidth = false, targetWidth = null) => {
+      if (!textLayout) return
+      
+      const { lines, actualLineHeight, startY } = textLayout
+      
+      // 一時的なキャンバスを作成してグラデーション用
+      const gradientCanvas = document.createElement('canvas')
+      gradientCanvas.width = canvasSize
+      gradientCanvas.height = canvasSize
+      const gradientCtx = gradientCanvas.getContext('2d')
+      
+      // 正方形全体にグラデーションを描画
+      gradientCtx.fillStyle = gradient
+      gradientCtx.fillRect(0, 0, canvasSize, canvasSize)
+      
+      // 文字用の一時キャンバスを作成
+      const textCanvas = document.createElement('canvas')
+      textCanvas.width = canvasSize
+      textCanvas.height = canvasSize
+      const textCtx = textCanvas.getContext('2d')
+      
+      // 文字を白で描画（マスクとして使用）
+      textCtx.fillStyle = 'white'
+      textCtx.font = `${fontSize}px ${fontFamily}`
+      textCtx.textAlign = 'center'
+      textCtx.textBaseline = 'middle'
+      
+      if (autoFitWidth && targetWidth) {
+        // 幅自動調整モード：各行を個別にスケール
+        lines.forEach((line, index) => {
+          const y = startY + index * actualLineHeight
+          
+          if (line.length === 0) return
+          
+          // 各行の実際の幅を測定
+          const lineMetrics = textCtx.measureText(line)
+          const actualLineWidth = lineMetrics.width
+          
+          // ターゲット幅に合わせて拡大または縮小して描画
+          const scaleX = targetWidth / actualLineWidth
+          
+          textCtx.save()
+          textCtx.translate(canvasSize / 2, y)
+          textCtx.scale(scaleX, 1)
+          textCtx.fillText(line, 0, 0)
+          textCtx.restore()
+        })
+      } else {
+        // 通常モード：固定幅で描画
+        lines.forEach((line, index) => {
+          const y = startY + index * actualLineHeight
+          textCtx.fillText(line, canvasSize / 2, y)
+        })
+      }
+      
+      // グラデーションキャンバスに文字マスクを適用
+      gradientCtx.globalCompositeOperation = 'destination-in'
+      gradientCtx.drawImage(textCanvas, 0, 0)
+      
+      // 最終結果をメインキャンバスに描画
+      ctx.drawImage(gradientCanvas, 0, 0)
+    },
+    []
+  )
+
+  // 幅自動調整モード用のテキストレイアウトを計算する関数（単色モード用）
   const drawTextWithAutoFit = useCallback(
     (ctx, lines, fontSize, fontFamily, targetWidth, canvasSize, lineHeight, verticalOffset) => {
       const actualLineHeight = fontSize * lineHeight
       const totalHeight = lines.length * actualLineHeight
-      const verticalOffsetPx = (canvasSize * verticalOffset) / 100 // パーセントをピクセルに変換
+      const verticalOffsetPx = (canvasSize * verticalOffset) / 100
       const startY = (canvasSize - totalHeight) / 2 + actualLineHeight / 2 + verticalOffsetPx
 
-      ctx.fillStyle = config.color
+      ctx.fillStyle = config.color || '#000000'
       ctx.font = `${fontSize}px ${fontFamily}`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
@@ -119,6 +239,7 @@ function PreviewPanel({ config }) {
         autoFitWidth,
         fontFamily,
         color,
+        useGradient = false,
         size,
         lineHeight,
         verticalOffset,
@@ -172,40 +293,81 @@ function PreviewPanel({ config }) {
         }
       }
 
-      // テキストスタイルを設定
-      ctx.fillStyle = color
-
-      if (autoFitWidth) {
-        // 幅自動調整モードでの描画（各行を個別に縮小）
-        const targetWidth = size * (1 - horizontalPadding / 100) * 0.9
-        drawTextWithAutoFit(
+      if (useGradient) {
+        // グラデーションモード：統一的にマスキング処理を使用
+        const gradient = createSquareGradient(ctx, size)
+        
+        const textLayout = calculateTextLayout(
           ctx,
-          lines,
+          text,
           finalFontSize,
           fontFamily,
-          targetWidth,
           size,
           lineHeight,
           verticalOffset
         )
+        
+        if (autoFitWidth) {
+          // 幅自動調整モード：マスキング処理 + 幅調整
+          const targetWidth = size * (1 - horizontalPadding / 100) * 0.9
+          drawTextWithGradientMask(
+            ctx,
+            textLayout,
+            finalFontSize,
+            fontFamily,
+            size,
+            gradient,
+            true, // autoFitWidth
+            targetWidth
+          )
+        } else {
+          // 通常モード：マスキング処理のみ
+          drawTextWithGradientMask(
+            ctx,
+            textLayout,
+            finalFontSize,
+            fontFamily,
+            size,
+            gradient,
+            false // autoFitWidth
+          )
+        }
       } else {
-        // 通常モードでの描画
-        ctx.font = `${finalFontSize}px ${fontFamily}`
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
+        // 単色モード
+        ctx.fillStyle = color
+        
+        if (autoFitWidth) {
+          // 幅自動調整モードでの描画（各行を個別に縮小）
+          const targetWidth = size * (1 - horizontalPadding / 100) * 0.9
+          drawTextWithAutoFit(
+            ctx,
+            lines,
+            finalFontSize,
+            fontFamily,
+            targetWidth,
+            size,
+            lineHeight,
+            verticalOffset
+          )
+        } else {
+          // 通常モードでの描画
+          ctx.font = `${finalFontSize}px ${fontFamily}`
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
 
-        const actualLineHeight = finalFontSize * lineHeight
-        const totalHeight = lines.length * actualLineHeight
-        const verticalOffsetPx = (size * verticalOffset) / 100 // パーセントをピクセルに変換
-        const startY = (size - totalHeight) / 2 + actualLineHeight / 2 + verticalOffsetPx
+          const actualLineHeight = finalFontSize * lineHeight
+          const totalHeight = lines.length * actualLineHeight
+          const verticalOffsetPx = (size * verticalOffset) / 100
+          const startY = (size - totalHeight) / 2 + actualLineHeight / 2 + verticalOffsetPx
 
-        lines.forEach((line, index) => {
-          const y = startY + index * actualLineHeight
-          ctx.fillText(line, size / 2, y)
-        })
+          lines.forEach((line, index) => {
+            const y = startY + index * actualLineHeight
+            ctx.fillText(line, size / 2, y)
+          })
+        }
       }
     },
-    [config, drawTextWithAutoFit]
+    [config, drawTextWithAutoFit, createSquareGradient, calculateTextLayout, drawTextWithGradientMask]
   )
 
   useEffect(() => {
@@ -384,6 +546,35 @@ function PreviewPanel({ config }) {
                   {config.autoFitWidth ? '各行自動拡大・縮小' : '固定幅'}
                 </span>
               </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="font-medium text-gray-600">グラデーション:</span>
+                <span className="text-gray-900 bg-white px-2 py-1 rounded-sm">
+                  {config.useGradient ? 'ON' : 'OFF'}
+                </span>
+              </div>
+              {config.useGradient && (
+                <>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="font-medium text-gray-600">開始色:</span>
+                    <span className="text-gray-900 bg-white px-2 py-1 rounded-sm">
+                      {config.gradientColor1}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="font-medium text-gray-600">終了色:</span>
+                    <span className="text-gray-900 bg-white px-2 py-1 rounded-sm">
+                      {config.gradientColor2}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="font-medium text-gray-600">方向:</span>
+                    <span className="text-gray-900 bg-white px-2 py-1 rounded-sm">
+                      {config.gradientDirection === 'horizontal' ? '水平' : 
+                       config.gradientDirection === 'vertical' ? '垂直' : '斜め'}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}
