@@ -27,13 +27,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50">
       <header className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
+        <div className="absolute inset-0 bg-linear-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
         <div className="relative bg-white/80 backdrop-blur-md border-b border-white/20 shadow-lg">
           <div className="max-w-7xl mx-auto px-4 py-8">
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
                 Slack Emoji Maker
               </h1>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -71,7 +71,7 @@ function App() {
 
       {/* フローティング要素 */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-3">
-        <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg border border-gray-200/50">
+        <div className="bg-white/90 backdrop-blur-xs rounded-full p-3 shadow-lg border border-gray-200/50">
           <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"

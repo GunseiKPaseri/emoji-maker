@@ -107,14 +107,14 @@ function DesignPanel({ config, onConfigChange, onReset }) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 p-8 backdrop-blur-sm">
+    <div className="bg-linear-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-200/50 p-8 backdrop-blur-xs">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           デザイン設定
         </h2>
         <button
           onClick={onReset}
-          className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-2"
+          className="px-4 py-2 text-sm font-medium text-white bg-linear-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -139,7 +139,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
           placeholder="絵文字にするテキストを入力\n改行で複数行も可能"
           rows={3}
           maxLength="50"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500 resize-none"
         />
       </div>
 
@@ -171,7 +171,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
                           key={textIndex}
                           onClick={() => handleChange('text', text)}
                           title={text}
-                          className="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors duration-200"
+                          className="px-2 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-sm hover:bg-gray-200 transition-colors duration-200"
                         >
                           {text.replace(/\n/g, ' ')}
                         </button>
@@ -193,7 +193,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
           id="fontFamily"
           value={config.fontFamily}
           onChange={e => handleChange('fontFamily', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500"
         >
           {fontCategories.map(category => (
             <optgroup key={category.name} label={category.name}>
@@ -217,7 +217,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             type="checkbox"
             checked={config.autoFontSize}
             onChange={e => handleChange('autoFontSize', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-sm"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">フォントサイズを自動調整</span>
         </label>
@@ -245,7 +245,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             type="checkbox"
             checked={config.autoFitWidth}
             onChange={e => handleChange('autoFitWidth', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-sm"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">
             幅自動調整（各行を出力サイズに合わせて拡大・縮小）
@@ -312,14 +312,14 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             type="color"
             value={config.color}
             onChange={e => handleChange('color', e.target.value)}
-            className="h-10 w-16 rounded border border-gray-300 cursor-pointer"
+            className="h-10 w-16 rounded-sm border border-gray-300 cursor-pointer"
           />
           <input
             type="text"
             value={config.color}
             onChange={e => handleChange('color', e.target.value)}
             placeholder="#000000"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <div className="grid grid-cols-8 gap-1">
@@ -330,7 +330,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
               onClick={() => handleChange('color', preset.color)}
               title={preset.name}
               aria-label={`色を${preset.name}に変更`}
-              className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform duration-200"
+              className="w-6 h-6 rounded-sm border border-gray-300 hover:scale-110 transition-transform duration-200"
             />
           ))}
         </div>
@@ -342,7 +342,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
             type="checkbox"
             checked={config.transparentBackground}
             onChange={e => handleChange('transparentBackground', e.target.checked)}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded-sm"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">背景を透明にする</span>
         </label>
@@ -360,14 +360,14 @@ function DesignPanel({ config, onConfigChange, onReset }) {
                 type="color"
                 value={config.backgroundColor}
                 onChange={e => handleChange('backgroundColor', e.target.value)}
-                className="h-10 w-16 rounded border border-gray-300 cursor-pointer"
+                className="h-10 w-16 rounded-sm border border-gray-300 cursor-pointer"
               />
               <input
                 type="text"
                 value={config.backgroundColor}
                 onChange={e => handleChange('backgroundColor', e.target.value)}
                 placeholder="#FFFFFF"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -382,7 +382,7 @@ function DesignPanel({ config, onConfigChange, onReset }) {
           id="size"
           value={config.size}
           onChange={e => handleChange('size', parseInt(e.target.value))}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-xs focus:ring-blue-500 focus:border-blue-500"
         >
           <option value={64}>64×64 (小)</option>
           <option value={128}>128×128 (中)</option>
