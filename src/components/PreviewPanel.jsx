@@ -119,8 +119,6 @@ function PreviewPanel({ config }) {
         autoFitWidth,
         fontFamily,
         color,
-        backgroundColor,
-        transparentBackground,
         size,
         lineHeight,
         verticalOffset,
@@ -134,12 +132,9 @@ function PreviewPanel({ config }) {
       // 背景をクリア
       ctx.clearRect(0, 0, size, size)
 
-      // 背景を描画
-      if (isPreview && previewBackground) {
+      // 背景を描画（プレビュー用のみ）
+      if (isPreview && previewBackground && previewBackground !== 'transparent') {
         ctx.fillStyle = previewBackground
-        ctx.fillRect(0, 0, size, size)
-      } else if (!transparentBackground) {
-        ctx.fillStyle = backgroundColor
         ctx.fillRect(0, 0, size, size)
       }
 
@@ -381,12 +376,6 @@ function PreviewPanel({ config }) {
                 <span className="font-medium text-gray-600">左右余白:</span>
                 <span className="text-gray-900 font-mono bg-white px-2 py-1 rounded-sm">
                   {config.horizontalPadding}%
-                </span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="font-medium text-gray-600">背景:</span>
-                <span className="text-gray-900 bg-white px-2 py-1 rounded-sm">
-                  {config.transparentBackground ? '透明' : config.backgroundColor}
                 </span>
               </div>
               <div className="flex justify-between items-center py-2 col-span-1 md:col-span-2">
