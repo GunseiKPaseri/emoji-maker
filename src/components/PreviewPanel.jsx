@@ -221,7 +221,7 @@ function PreviewPanel({ config }) {
     drawToCanvas(lightCanvasRef.current, true, '#ffffff')
 
     // ダークモードプレビュー
-    drawToCanvas(darkCanvasRef.current, true, '#2f3349')
+    drawToCanvas(darkCanvasRef.current, true, '#1d1c1d')
 
     // 透明背景バージョンのbase64データを生成
     if (canvasRef.current) {
@@ -320,7 +320,7 @@ function PreviewPanel({ config }) {
               </svg>
               ダークモード
             </h4>
-            <div className="inline-block p-6 bg-linear-to-br from-gray-800 to-gray-900 border-2 border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="inline-block p-6 border-2 border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ backgroundColor: '#1d1c1d' }}>
               <canvas
                 ref={darkCanvasRef}
                 className="block rounded-lg"
@@ -469,7 +469,7 @@ function PreviewPanel({ config }) {
               <div className="w-3 h-3 bg-linear-to-r from-purple-500 to-indigo-600 rounded-full"></div>
               ダークモード
             </h5>
-            <div className="bg-linear-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 space-y-4 shadow-lg">
+            <div className="border border-gray-700 rounded-2xl p-6 space-y-4 shadow-lg"  style={{ backgroundColor: '#1d1c1d' }}>
               {/* 名前横スタンプ */}
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-linear-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
