@@ -1,66 +1,8 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState } from 'react'
 
-// 通常モード用フォントサイズ自動計算関数（幅と高さ両方を考慮）
-const calculateOptimalFontSize = (
-  ctx,
-  text,
-  maxWidth,
-  maxHeight,
-  fontFamily,
-  lineHeight = 1.2,
-  horizontalPadding = 10
-) => {
-  const lines = text.split('\n').filter(line => line.trim())
-  if (!lines.length) return 12
+import { useCanvasDrawing } from '../hooks/useCanvasDrawing'
 
-  // 左右余白を考慮した実際の使用可能幅
-  const availableWidth = maxWidth * (1 - horizontalPadding / 100)
-
-  let fontSize = Math.min(maxWidth, maxHeight)
-  let textFits = false
-
-  while (fontSize > 8 && !textFits) {
-    ctx.font = `${fontSize}px ${fontFamily}`
-
-    let totalHeight = 0
-    let maxLineWidth = 0
-
-    for (const line of lines) {
-      const metrics = ctx.measureText(line)
-      maxLineWidth = Math.max(maxLineWidth, metrics.width)
-      totalHeight += fontSize * lineHeight // 行間を考慮
-    }
-
-    if (maxLineWidth <= availableWidth * 0.9 && totalHeight <= maxHeight * 0.9) {
-      textFits = true
-    } else {
-      fontSize -= 2
-    }
-  }
-
-  return Math.max(fontSize, 8)
-}
-
-// 幅自動調整モード用フォントサイズ計算関数（高さのみを基準とする）
-const calculateOptimalFontSizeForAutoFit = (ctx, text, maxHeight, lineHeight = 1.2) => {
-  const lines = text.split('\n').filter(line => line.trim())
-  if (!lines.length) return 12
-
-  // 行数を考慮して最適な行の高さを計算
-  const lineCount = lines.length
-
-  // 利用可能な高さの90%を使用
-  const availableHeight = maxHeight * 0.9
-
-  // 各行に割り当てられる高さ
-  const heightPerLine = availableHeight / lineCount
-
-  // フォントサイズを行の高さから逆算
-  const fontSize = heightPerLine / lineHeight
-
-  // 最小8px、最大値は元の制限を維持
-  return Math.max(8, Math.min(fontSize, maxHeight))
-}
+import SlackPreview from './SlackPreview'
 
 function PreviewPanel({ config }) {
   const canvasRef = useRef(null)
@@ -70,320 +12,25 @@ function PreviewPanel({ config }) {
   const [showSettings, setShowSettings] = useState(false)
   const [emojiDataUrl, setEmojiDataUrl] = useState('')
 
-  // 正方形グラデーションを作成する関数
-  const createSquareGradient = useCallback(
-    (ctx, canvasSize) => {
-      const gradientDirection = config.gradientDirection || 'horizontal'
-      const gradientColor1 = config.gradientColor1 || '#FF6B6B'
-      const gradientColor2 = config.gradientColor2 || '#4ECDC4'
-      
-      let gradient
-      
-      switch (gradientDirection) {
-        case 'horizontal':
-          gradient = ctx.createLinearGradient(0, 0, canvasSize, 0)
-          break
-        case 'vertical':
-          gradient = ctx.createLinearGradient(0, 0, 0, canvasSize)
-          break
-        case 'diagonal':
-          gradient = ctx.createLinearGradient(0, 0, canvasSize, canvasSize)
-          break
-        default:
-          gradient = ctx.createLinearGradient(0, 0, canvasSize, 0)
-      }
-      
-      gradient.addColorStop(0, gradientColor1)
-      gradient.addColorStop(1, gradientColor2)
-      return gradient
-    },
-    [config.gradientColor1, config.gradientColor2, config.gradientDirection]
-  )
-
-  // 文字の配置情報を計算する関数
-  const calculateTextLayout = useCallback(
-    (ctx, text, fontSize, fontFamily, canvasSize, lineHeight, verticalOffset) => {
-      ctx.font = `${fontSize}px ${fontFamily}`
-      const lines = text.split('\n').filter(line => line.trim())
-      
-      if (lines.length === 0) return null
-      
-      const actualLineHeight = fontSize * lineHeight
-      const totalHeight = lines.length * actualLineHeight
-      const verticalOffsetPx = (canvasSize * verticalOffset) / 100
-      const startY = (canvasSize - totalHeight) / 2 + actualLineHeight / 2 + verticalOffsetPx
-      
-      return {
-        lines,
-        actualLineHeight,
-        totalHeight,
-        startY
-      }
-    },
-    []
-  )
-
-  // マスキング処理でグラデーションを文字に適用する関数
-  const drawTextWithGradientMask = useCallback(
-    (ctx, textLayout, fontSize, fontFamily, canvasSize, gradient, autoFitWidth = false, targetWidth = null) => {
-      if (!textLayout) return
-      
-      const { lines, actualLineHeight, startY } = textLayout
-      
-      // 一時的なキャンバスを作成してグラデーション用
-      const gradientCanvas = document.createElement('canvas')
-      gradientCanvas.width = canvasSize
-      gradientCanvas.height = canvasSize
-      const gradientCtx = gradientCanvas.getContext('2d')
-      
-      // 正方形全体にグラデーションを描画
-      gradientCtx.fillStyle = gradient
-      gradientCtx.fillRect(0, 0, canvasSize, canvasSize)
-      
-      // 文字用の一時キャンバスを作成
-      const textCanvas = document.createElement('canvas')
-      textCanvas.width = canvasSize
-      textCanvas.height = canvasSize
-      const textCtx = textCanvas.getContext('2d')
-      
-      // 文字を白で描画（マスクとして使用）
-      textCtx.fillStyle = 'white'
-      textCtx.font = `${fontSize}px ${fontFamily}`
-      textCtx.textAlign = 'center'
-      textCtx.textBaseline = 'middle'
-      
-      if (autoFitWidth && targetWidth) {
-        // 幅自動調整モード：各行を個別にスケール
-        lines.forEach((line, index) => {
-          const y = startY + index * actualLineHeight
-          
-          if (line.length === 0) return
-          
-          // 各行の実際の幅を測定
-          const lineMetrics = textCtx.measureText(line)
-          const actualLineWidth = lineMetrics.width
-          
-          // ターゲット幅に合わせて拡大または縮小して描画
-          const scaleX = targetWidth / actualLineWidth
-          
-          textCtx.save()
-          textCtx.translate(canvasSize / 2, y)
-          textCtx.scale(scaleX, 1)
-          textCtx.fillText(line, 0, 0)
-          textCtx.restore()
-        })
-      } else {
-        // 通常モード：固定幅で描画
-        lines.forEach((line, index) => {
-          const y = startY + index * actualLineHeight
-          textCtx.fillText(line, canvasSize / 2, y)
-        })
-      }
-      
-      // グラデーションキャンバスに文字マスクを適用
-      gradientCtx.globalCompositeOperation = 'destination-in'
-      gradientCtx.drawImage(textCanvas, 0, 0)
-      
-      // 最終結果をメインキャンバスに描画
-      ctx.drawImage(gradientCanvas, 0, 0)
-    },
-    []
-  )
-
-  // 幅自動調整モード用のテキストレイアウトを計算する関数（単色モード用）
-  const drawTextWithAutoFit = useCallback(
-    (ctx, lines, fontSize, fontFamily, targetWidth, canvasSize, lineHeight, verticalOffset) => {
-      const actualLineHeight = fontSize * lineHeight
-      const totalHeight = lines.length * actualLineHeight
-      const verticalOffsetPx = (canvasSize * verticalOffset) / 100
-      const startY = (canvasSize - totalHeight) / 2 + actualLineHeight / 2 + verticalOffsetPx
-
-      ctx.fillStyle = config.color || '#000000'
-      ctx.font = `${fontSize}px ${fontFamily}`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-
-      lines.forEach((line, index) => {
-        const y = startY + index * actualLineHeight
-
-        if (line.length === 0) return
-
-        // 各行の実際の幅を測定
-        const lineMetrics = ctx.measureText(line)
-        const actualLineWidth = lineMetrics.width
-
-        // ターゲット幅に合わせて拡大または縮小して描画
-        const scaleX = targetWidth / actualLineWidth
-
-        // 拡大・縮小して描画
-        ctx.save()
-        ctx.translate(canvasSize / 2, y)
-        ctx.scale(scaleX, 1)
-        ctx.fillText(line, 0, 0)
-        ctx.restore()
-      })
-    },
-    [config.color]
-  )
-
-  // キャンバスに描画する関数
-  const drawToCanvas = useCallback(
-    (canvas, isPreview = false, previewBackground = null) => {
-      if (!canvas) return
-
-      const ctx = canvas.getContext('2d')
-      const {
-        text,
-        fontSize,
-        autoFontSize,
-        autoFitWidth,
-        fontFamily,
-        color,
-        useGradient = false,
-        size,
-        lineHeight,
-        verticalOffset,
-        horizontalPadding,
-      } = config
-
-      // キャンバスサイズを設定
-      canvas.width = size
-      canvas.height = size
-
-      // 背景をクリア
-      ctx.clearRect(0, 0, size, size)
-
-      // 背景を描画（プレビュー用のみ）
-      if (isPreview && previewBackground && previewBackground !== 'transparent') {
-        ctx.fillStyle = previewBackground
-        ctx.fillRect(0, 0, size, size)
-      }
-
-      // 高品質なレンダリング（アンチエイリアス適用）
-      ctx.imageSmoothingEnabled = true
-      ctx.imageSmoothingQuality = 'high'
-      ctx.textRenderingOptimization = 'optimizeQuality'
-      if (ctx.textRendering) {
-        ctx.textRendering = 'geometricPrecision'
-      }
-
-      const lines = text.split('\n').filter(line => line.trim())
-      if (!lines.length) return
-
-      // フォントサイズを決定
-      let finalFontSize = fontSize
-      if (autoFontSize) {
-        if (autoFitWidth) {
-          // 幅自動調整モードでは高さのみを基準にフォントサイズを計算
-          finalFontSize = calculateOptimalFontSizeForAutoFit(ctx, text, size, lineHeight)
-        } else {
-          // 通常モードでは幅と高さ両方を考慮
-          finalFontSize = calculateOptimalFontSize(
-            ctx,
-            text,
-            size,
-            size,
-            fontFamily,
-            lineHeight,
-            horizontalPadding
-          )
-        }
-        if (!isPreview) {
-          setCalculatedFontSize(finalFontSize)
-        }
-      }
-
-      if (useGradient) {
-        // グラデーションモード：統一的にマスキング処理を使用
-        const gradient = createSquareGradient(ctx, size)
-        
-        const textLayout = calculateTextLayout(
-          ctx,
-          text,
-          finalFontSize,
-          fontFamily,
-          size,
-          lineHeight,
-          verticalOffset
-        )
-        
-        if (autoFitWidth) {
-          // 幅自動調整モード：マスキング処理 + 幅調整
-          const targetWidth = size * (1 - horizontalPadding / 100) * 0.9
-          drawTextWithGradientMask(
-            ctx,
-            textLayout,
-            finalFontSize,
-            fontFamily,
-            size,
-            gradient,
-            true, // autoFitWidth
-            targetWidth
-          )
-        } else {
-          // 通常モード：マスキング処理のみ
-          drawTextWithGradientMask(
-            ctx,
-            textLayout,
-            finalFontSize,
-            fontFamily,
-            size,
-            gradient,
-            false // autoFitWidth
-          )
-        }
-      } else {
-        // 単色モード
-        ctx.fillStyle = color
-        
-        if (autoFitWidth) {
-          // 幅自動調整モードでの描画（各行を個別に縮小）
-          const targetWidth = size * (1 - horizontalPadding / 100) * 0.9
-          drawTextWithAutoFit(
-            ctx,
-            lines,
-            finalFontSize,
-            fontFamily,
-            targetWidth,
-            size,
-            lineHeight,
-            verticalOffset
-          )
-        } else {
-          // 通常モードでの描画
-          ctx.font = `${finalFontSize}px ${fontFamily}`
-          ctx.textAlign = 'center'
-          ctx.textBaseline = 'middle'
-
-          const actualLineHeight = finalFontSize * lineHeight
-          const totalHeight = lines.length * actualLineHeight
-          const verticalOffsetPx = (size * verticalOffset) / 100
-          const startY = (size - totalHeight) / 2 + actualLineHeight / 2 + verticalOffsetPx
-
-          lines.forEach((line, index) => {
-            const y = startY + index * actualLineHeight
-            ctx.fillText(line, size / 2, y)
-          })
-        }
-      }
-    },
-    [config, drawTextWithAutoFit, createSquareGradient, calculateTextLayout, drawTextWithGradientMask]
-  )
+  const { drawToCanvas } = useCanvasDrawing()
 
   useEffect(() => {
     // メインキャンバス（ダウンロード用）
-    drawToCanvas(canvasRef.current)
+    const fontSize = drawToCanvas(canvasRef.current, config)
+    if (fontSize && config.autoFontSize) {
+      setCalculatedFontSize(fontSize)
+    }
 
     // ライトモードプレビュー
-    drawToCanvas(lightCanvasRef.current, true, '#ffffff')
+    drawToCanvas(lightCanvasRef.current, config, true, '#ffffff')
 
     // ダークモードプレビュー
-    drawToCanvas(darkCanvasRef.current, true, '#1d1c1d')
+    drawToCanvas(darkCanvasRef.current, config, true, '#1d1c1d')
 
     // 透明背景バージョンのbase64データを生成
     if (canvasRef.current) {
       const transparentCanvas = document.createElement('canvas')
-      drawToCanvas(transparentCanvas, true, 'transparent')
+      drawToCanvas(transparentCanvas, config, true, 'transparent')
       const dataUrl = transparentCanvas.toDataURL('image/png')
       setEmojiDataUrl(dataUrl)
     }
@@ -448,7 +95,11 @@ function PreviewPanel({ config }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div className="text-center">
             <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center justify-center gap-2">
-              <svg className="w-3 sm:w-4 h-3 sm:h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-3 sm:w-4 h-3 sm:h-4 text-yellow-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 18a8 8 0 100-16 8 8 0 000 16z"
@@ -472,12 +123,19 @@ function PreviewPanel({ config }) {
 
           <div className="text-center">
             <h4 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3 flex items-center justify-center gap-2">
-              <svg className="w-3 sm:w-4 h-3 sm:h-4 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg
+                className="w-3 sm:w-4 h-3 sm:h-4 text-purple-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
                 <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
               </svg>
               ダークモード
             </h4>
-            <div className="inline-block p-3 sm:p-4 lg:p-6 border-2 border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ backgroundColor: '#1d1c1d' }}>
+            <div
+              className="inline-block p-3 sm:p-4 lg:p-6 border-2 border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
+              style={{ backgroundColor: '#1d1c1d' }}
+            >
               <canvas
                 ref={darkCanvasRef}
                 className="block rounded-lg"
@@ -569,8 +227,11 @@ function PreviewPanel({ config }) {
                   <div className="flex justify-between items-center py-2">
                     <span className="font-medium text-gray-600">方向:</span>
                     <span className="text-gray-900 bg-white px-2 py-1 rounded-sm">
-                      {config.gradientDirection === 'horizontal' ? '水平' : 
-                       config.gradientDirection === 'vertical' ? '垂直' : '斜め'}
+                      {config.gradientDirection === 'horizontal'
+                        ? '水平'
+                        : config.gradientDirection === 'vertical'
+                          ? '垂直'
+                          : '斜め'}
                     </span>
                   </div>
                 </>
@@ -579,130 +240,7 @@ function PreviewPanel({ config }) {
           </div>
         )}
 
-        {/* Slackスタンプ使用プレビュー */}
-        <div className="mt-10">
-          <h4 className="text-xl font-bold text-gray-900 mb-6 text-center">Slackでの使用例</h4>
-
-          {/* ライトモード */}
-          <div className="mb-8">
-            <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <div className="w-3 h-3 bg-linear-to-r from-yellow-400 to-orange-400 rounded-full"></div>
-              ライトモード
-            </h5>
-            <div className="bg-white border border-gray-200 rounded-2xl p-6 space-y-4 shadow-xs">
-              {/* 名前横スタンプ */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                  U
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-semibold text-gray-900">ユーザー名</span>
-                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-4 h-4" />}
-                    <span className="text-xs text-gray-500">午後2:30</span>
-                  </div>
-                  <div className="text-gray-700">プロジェクトが完了しました！</div>
-                </div>
-              </div>
-
-              {/* 単体スタンプ */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-green-500 to-green-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                  T
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="font-semibold text-gray-900">田中</span>
-                    <span className="text-xs text-gray-500">午後2:31</span>
-                  </div>
-                  <div>
-                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-10 h-10" />}
-                  </div>
-                </div>
-              </div>
-
-              {/* 文中スタンプ */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                  S
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-semibold text-gray-900">佐藤</span>
-                    <span className="text-xs text-gray-500">午後2:32</span>
-                  </div>
-                  <div className="text-gray-700 flex items-center gap-2">
-                    お疲れ様でした！
-                    {emojiDataUrl && (
-                      <img src={emojiDataUrl} alt="emoji" className="w-6 h-6 inline-block" />
-                    )}
-                    素晴らしい成果ですね
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ダークモード */}
-          <div className="mb-8">
-            <h5 className="text-sm font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <div className="w-3 h-3 bg-linear-to-r from-purple-500 to-indigo-600 rounded-full"></div>
-              ダークモード
-            </h5>
-            <div className="border border-gray-700 rounded-2xl p-6 space-y-4 shadow-lg"  style={{ backgroundColor: '#1d1c1d' }}>
-              {/* 名前横スタンプ */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-blue-500 to-blue-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                  U
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-semibold text-white">ユーザー名</span>
-                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-4 h-4" />}
-                    <span className="text-xs text-gray-400">午後2:30</span>
-                  </div>
-                  <div className="text-gray-300">プロジェクトが完了しました！</div>
-                </div>
-              </div>
-
-              {/* 単体スタンプ */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-green-500 to-green-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                  T
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="font-semibold text-white">田中</span>
-                    <span className="text-xs text-gray-400">午後2:31</span>
-                  </div>
-                  <div>
-                    {emojiDataUrl && <img src={emojiDataUrl} alt="emoji" className="w-10 h-10" />}
-                  </div>
-                </div>
-              </div>
-
-              {/* 文中スタンプ */}
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-linear-to-r from-purple-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-                  S
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="font-semibold text-white">佐藤</span>
-                    <span className="text-xs text-gray-400">午後2:32</span>
-                  </div>
-                  <div className="text-gray-300 flex items-center gap-2">
-                    お疲れ様でした！
-                    {emojiDataUrl && (
-                      <img src={emojiDataUrl} alt="emoji" className="w-6 h-6 inline-block" />
-                    )}
-                    素晴らしい成果ですね
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <SlackPreview emojiDataUrl={emojiDataUrl} />
       </div>
 
       <div className="mt-10 space-y-6">
@@ -712,7 +250,12 @@ function PreviewPanel({ config }) {
           className="w-full px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold text-base sm:text-lg rounded-2xl hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl cursor-pointer"
         >
           <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <svg className="w-5 sm:w-6 h-5 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 sm:w-6 h-5 sm:h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
